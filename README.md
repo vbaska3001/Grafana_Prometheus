@@ -3,9 +3,9 @@
 This repository contains the configuration and installation steps for setting up **Prometheus** and **Grafana** on Kubernetes using **Helm**, with **Persistent Volumes (PV)** and **Persistent Volume Claims (PVC)** for data persistence.
 
 ## Repository Structure
-- `prometheus/` – Prometheus PV, PVC and related configs
-- `grafana/` – Grafana PV, PVC and Grafana manifests
-- `installation/` – Text file with detailed installation steps
+- `Prometheus/` – Prometheus PV, PVC and related configs
+- `Grafana/` – Grafana PV, PVC and Grafana manifests
+- `Prometheus_Grafana_Installation/` – Text file with detailed installation steps
 
 ## Installation Order
 
