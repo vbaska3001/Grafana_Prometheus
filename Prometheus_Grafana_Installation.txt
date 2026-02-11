@@ -1,0 +1,65 @@
+# PROMETHEUS INSTALLATION COMMANDS:
+
+
+# To Remove Exxisting Helm Configurations
+
+helm list -A
+helm uninstall prometheus -n monitoring
+kubectl delete pvc prometheus-server -n monitoring
+
+# Verify Clean Helm Configurations:
+
+helm list -A
+kubectl get pv -n monitoring
+kubectl get pvc -n monitoring
+kubectl get pods -n monitoring
+kubectl delete ns monitoring
+
+# Fresh Prometheus Installation:
+
+# Pre-Requisites:
+
+# 1 Master Server and 1 Slave Server
+
+# Login as sudo user: sudo -s
+# Create Prometheus directory in both Master and Ubuntu Servers
+
+# In Master Server:
+
+# Create pv.yaml and pvc.yaml files with prometheus configurations and slave-2 in value for nodeAffinity
+
+# Create Namespace:
+
+kubectl create namespace monitoring
+kubectl get ns
+
+# Apply pv.yaml
+
+kubectl apply -f pv.yaml -n monitoring
+
+# Prometheus Installation usingg Helm
+
+# Add Helm repo and Update:
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+# Install Prometheus server using helm commands:
+
+helm install prometheus prometheus-community/prometheus \
+--namespace monitoring \
+--set alertmanager.persistentVolume.storageClass="local-storage" \
+--set server.persistentVolume.storageClass="local-storage"
+
+
+
+
+
+
+
+
+
+
+
+
+
