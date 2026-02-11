@@ -51,15 +51,97 @@ helm install prometheus prometheus-community/prometheus \
 --set alertmanager.persistentVolume.storageClass="local-storage" \
 --set server.persistentVolume.storageClass="local-storage"
 
+# Verify Installation:
+
+helm list -A
+kubectl get pods -n monitoring
+
+# 7 Pods for Prometheus will be running
+# prometheus-server-76858499d4-bjr8j pod alone will be in pending state due to improper pvc bounding
+
+kubectl get pv -n monitoring
+kubectl get pvc -n monitoring
+
+# PV will be available. But not bound. To Bound delete the helm default pvc.
+
+kubectl delete pvc prometheus-server -n monitoring
+
+# Apply our create pvc.yaml file to bound with the pv
+
+kubectl apply -f pvc.yaml -n monitoring
+
+# Now verify pv and pvc bounding 
+
+kubectl get pv -n monitoring
+kubectl get pvc -n monitoring
+
+# Verify Overall Helm and Pod running status for our Promethheus Server. Server is Up Now!!!
+
+helm list -A
+kubectl get pods -n monitoring
 
 
+# GRAFANA INSTALLATION STEPS WITH COMMANDS:
 
+# In Master and Slave servers, create a directory called Grafana for PV and PVC.
+# In Master add the pv and pvc.yaml files for configurations.
 
+# Apply grafana pv.yaml file to create pv
 
+kubectl apply -f pv.yaml -n monitoring
 
+# Now add the grafana.yaml file in the same Grafana folder in our Master server
+# Apply the grafana.yaml file in monitoring namespace
 
+kubectl apply -f grafana.yaml -n monitoring
 
+# Install Grafana using Helm Commands:
+# Note: Edit admin password to Admin123 and mention location of grafana.yaml as present in Master Server
 
+helm install grafana grafana/grafana \
+--namespace monitoring \
+--set persistence.storageClassName="local-storage" \
+--set persistence.enabled=true \
+--set adminPassword='Admin123' \
+--values /home/ubuntu/grafana/grafana.yaml \
+--set service.type=NodePort
 
+# Verify Installation using helm and pod commands
 
+helm list -A
+kubectl get pods -n monitoring
+
+# Similar to Prometheus, for Grafana also PV will be available; but not bound. To Bound delete the helm default pvc.
+
+kubectl delete pvc grafana -n monitoring
+
+# Apply our create pvc.yaml file to bound with the pv
+
+kubectl apply -f pvc.yaml -n monitoring
+
+# Now verify pv and pvc bounding 
+
+kubectl get pv -n monitoring
+kubectl get pvc -n monitoring
+
+# Verify Overall Helm and Pod running status for our Grafana Server. 
+
+helm list -A
+kubectl get pods -n monitoring
+
+# Now to find the port binding usin the svc command:
+
+kubectl get svc -n monitoring
+
+# Server is Up Now!!! 
+# Use the Master Node Ip:Port to login via web browser.
+# Use Default Username: admin Password: Admin123 to login
+
+# GRAFANA DASHBOARD CONIFGURATION
+
+# After loging in, Select Dashboard view from the left pane.
+# On Top right corner, select create Dashboard and selet Import Option
+# Use the Codes: 11802,1860,17375 one at a time configure the dashbaord. 
+# Click next and under Server, select Prometheus server for our conifgured server.
+# Click Import. Now our Grafana Dashboard will show metrics of all values as per template using graphs and charts.
 
